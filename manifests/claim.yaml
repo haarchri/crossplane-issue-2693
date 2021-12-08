@@ -1,0 +1,6 @@
+apiVersion: ck8s.crossplane.io/v1alpha1
+kind: test
+metadata: 
+  name: test
+spec:
+  deletionPolicy: Delete

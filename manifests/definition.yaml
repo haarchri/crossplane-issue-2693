@@ -1,0 +1,47 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: test.ck8s.crossplane.io
+spec:
+  defaultCompositionRef:
+    name: ck8s
+  group: ck8s.crossplane.io
+  names:
+    categories:
+      - crossplane
+      - ck8s
+    kind: test
+    plural: test
+  versions:
+    - additionalPrinterColumns: []
+      name: v1alpha1
+      referenceable: true
+      served: true
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              description: >
+                A Test Description
+              properties:
+                deletionPolicy:
+                  # yamllint disable rule:line-length
+                  description: DeletionPolicy specifies what will happen to the underlying
+                    external when this managed resource is deleted - either "Delete"
+                    or "Orphan" the external resource. The "Delete" policy is the default
+                    when no policy is specified.
+                  # yamllint enable rule:line-length
+                  enum:
+                    - Orphan
+                    - Delete
+                  type: string
+            status:
+              description: >
+                A Status represents the observed states
+              properties:
+                eks:
+                  description: >
+                    Freeform field containing information about needed eks fields
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+              type: object

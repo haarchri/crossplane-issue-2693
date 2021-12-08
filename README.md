@@ -1,0 +1,1 @@
+# test for https://github.com/crossplane/crossplane/issues/2693

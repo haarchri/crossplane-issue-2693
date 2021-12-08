@@ -1,0 +1,75 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  labels:
+    devops.company.systems/provider: aws-helm
+    devops.company.systems/purpose: ck8s
+  name: ck8s
+spec:
+  compositeTypeRef:
+    apiVersion: ck8s.crossplane.io/v1alpha1
+    kind: test
+  resources:
+    - name: Route53-HostedZone
+      base:
+        apiVersion: route53.aws.crossplane.io/v1alpha1
+        kind: HostedZone
+        spec:
+          forProvider: 
+            name: test.crossplane.io
+            vpc:
+              vpcId: vpc-0be52101b468e7a88
+              vpcRegion: eu-central-1
+            config:
+              privateZone: true
+      patches:
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.hostedZone.id
+          toFieldPath: status.eks.hostedZone.id
+          policy:
+            fromFieldPath: Optional
+
+    - name: IAM-Policy-System-external-dns
+      base:
+        apiVersion: identity.aws.crossplane.io/v1alpha1
+        kind: IAMPolicy
+        metadata:
+          labels:
+            role: ck8s-external-dns
+        spec:
+          forProvider:
+            name: ck8s-external-dns
+      patches:
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.arn
+          toFieldPath: status.eks.iamRole.external-dns
+          policy:
+            fromFieldPath: Optional
+        - type: CombineFromComposite
+          combine:
+            variables:
+              - fromFieldPath: status.eks.hostedZone.id
+            strategy: string
+            string:
+              fmt: |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "route53:ListResourceRecordSets",
+                                "route53:ListHostedZones"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": "route53:ChangeResourceRecordSets",
+                            "Resource": "arn:aws:route53:::hostedzone/%s"
+                        }
+                    ]
+                }
+          toFieldPath: spec.forProvider.document
+          policy:
+            fromFieldPath: Required

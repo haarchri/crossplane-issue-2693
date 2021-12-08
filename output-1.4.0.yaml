@@ -1,0 +1,51 @@
+NAME      	NAMESPACE        	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
+crossplane	crossplane-system	1       	2021-12-08 21:36:43.659826 +0100 CET	deployed	crossplane-1.4.0	1.4.0      
+NAME                                                           HEALTHY   REVISION   IMAGE                                       STATE    DEP-FOUND   DEP-INSTALLED   AGE
+providerrevision.pkg.crossplane.io/provider-aws-890b1f912ae6   True      1          docker.io/crossplane/provider-aws:v0.21.2   Active                               2m27s
+
+--- 
+
+NAME                                              ARN                                                  READY   SYNCED   AGE
+iampolicy.identity.aws.crossplane.io/test-pwtsx   arn:aws:iam::255932642927:policy/ck8s-external-dns   True    True     37s
+
+NAME                                              READY   SYNCED   ID                      RRS   AGE
+hostedzone.route53.aws.crossplane.io/test-fw7zd   True    True     Z0790528333H4CNOA7L3T   2     69s
+
+--- 
+
+apiVersion: ck8s.crossplane.io/v1alpha1
+kind: test
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"ck8s.crossplane.io/v1alpha1","kind":"test","metadata":{"annotations":{},"name":"test"},"spec":{"deletionPolicy":"Delete"}}
+  creationTimestamp: "2021-12-08T20:38:56Z"
+  generation: 4
+  labels:
+    crossplane.io/composite: test
+  name: test
+  resourceVersion: "1803"
+  uid: c6d6d0c2-3953-4fd5-8314-c3f47a700703
+spec:
+  compositionRef:
+    name: ck8s
+  compositionUpdatePolicy: Automatic
+  deletionPolicy: Delete
+  resourceRefs:
+  - apiVersion: route53.aws.crossplane.io/v1alpha1
+    kind: HostedZone
+    name: test-fw7zd
+  - apiVersion: identity.aws.crossplane.io/v1alpha1
+    kind: IAMPolicy
+    name: test-pwtsx
+status:
+  conditions:
+  - lastTransitionTime: "2021-12-08T20:39:57Z"
+    reason: Available
+    status: "True"
+    type: Ready
+  eks:
+    hostedZone:
+      id: /hostedzone/Z0790528333H4CNOA7L3T
+    iamRole:
+      external-dns: arn:aws:iam::255932642927:policy/ck8s-external-dns

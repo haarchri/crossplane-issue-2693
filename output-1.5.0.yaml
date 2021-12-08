@@ -1,0 +1,51 @@
+NAME      	NAMESPACE        	REVISION	UPDATED                            	STATUS  	CHART           	APP VERSION
+crossplane	crossplane-system	1       	2021-12-08 21:46:13.33715 +0100 CET	deployed	crossplane-1.5.0	1.5.0      
+NAME                                                           HEALTHY   REVISION   IMAGE                                       STATE    DEP-FOUND   DEP-INSTALLED   AGE
+providerrevision.pkg.crossplane.io/provider-aws-890b1f912ae6   True      1          docker.io/crossplane/provider-aws:v0.21.2   Active                               2m27s
+
+---
+
+NAME                                              ARN                                                  READY   SYNCED   AGE
+iampolicy.identity.aws.crossplane.io/test-xjvqq   arn:aws:iam::255932642927:policy/ck8s-external-dns   True    True     36s
+
+NAME                                              READY   SYNCED   ID                      RRS   AGE
+hostedzone.route53.aws.crossplane.io/test-h97hb   True    True     Z06770743O24DNOAC4BTV   2     69s
+
+---
+  
+apiVersion: ck8s.crossplane.io/v1alpha1
+kind: test
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"ck8s.crossplane.io/v1alpha1","kind":"test","metadata":{"annotations":{},"name":"test"},"spec":{"deletionPolicy":"Delete"}}
+  creationTimestamp: "2021-12-08T20:48:24Z"
+  generation: 4
+  labels:
+    crossplane.io/composite: test
+  name: test
+  resourceVersion: "1781"
+  uid: 06d9e2c7-c5a5-4309-81d8-aa06b194c85d
+spec:
+  compositionRef:
+    name: ck8s
+  compositionUpdatePolicy: Automatic
+  deletionPolicy: Delete
+  resourceRefs:
+  - apiVersion: route53.aws.crossplane.io/v1alpha1
+    kind: HostedZone
+    name: test-h97hb
+  - apiVersion: identity.aws.crossplane.io/v1alpha1
+    kind: IAMPolicy
+    name: test-xjvqq
+status:
+  conditions:
+  - lastTransitionTime: "2021-12-08T20:49:26Z"
+    reason: Available
+    status: "True"
+    type: Ready
+  eks:
+    hostedZone:
+      id: /hostedzone/Z06770743O24DNOAC4BTV
+    iamRole:
+      external-dns: arn:aws:iam::255932642927:policy/ck8s-external-dns
